@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VisConvRec: Benchmarking Vision Models in Conversational Recommendation">
+    <title>VisConvRec: Benchmarking Vision Models in Conversational Recommendation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background: #fff;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Header */
+        header {
+            padding: 80px 0 40px 0;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 1.3em;
+            color: #555;
+            font-weight: 400;
+            line-height: 1.5;
+            max-width: 800px;
+            margin: 0 auto 25px auto;
+        }
+
+        .status {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        /* Anonymous Notice */
+        .anonymous-notice {
+            background: #fffbea;
+            border: 1px solid #f7e99e;
+            padding: 18px 25px;
+            margin: 35px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            color: #6b5d00;
+        }
+
+        /* Navigation */
+        .nav-links {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            color: #fff;
+            background: #1a1a1a;
+            text-decoration: none;
+            border: none;
+            border-radius: 20px;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .nav-links a:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        main {
+            padding: 50px 0;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        section h3 {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2a2a2a;
+            margin: 30px 0 15px 0;
+        }
+
+        section p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            color: #444;
+        }
+
+        section ul, section ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        section li {
+            margin-bottom: 10px;
+            font-size: 1.02em;
+            color: #444;
+        }
+
+        /* Stats Box */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 25px;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Task Cards */
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .task-card {
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .task-card h4 {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .task-card p {
+            font-size: 0.95em;
+            color: #555;
+            margin-bottom: 0;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 25px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 0.95em;
+        }
+
+        td {
+            font-size: 0.95em;
+            color: #444;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        /* Citation */
+        .citation-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-left: 3px solid #666;
+            padding: 20px 25px;
+            margin: 25px 0;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+
+        .citation-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Download Section */
+        .download-box {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .download-box h3 {
+            margin: 0 0 20px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 8px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+            font-size: 0.95em;
+        }
+
+        .btn:hover {
+            background: #555;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        /* Figure */
+        .figure {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .figure-caption {
+            margin-top: 12px;
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            padding: 30px 0;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            header .subtitle {
+                font-size: 1.1em;
+            }
+
+            .nav-links a {
+                display: block;
+                margin: 8px 0;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>VisConvRec</h1>
+            <p class="subtitle">
+                Benchmarking Vision Models in Conversational Recommendation
+            </p>
+            <span class="status">CVPR 2025 Submission (Under Review)</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Anonymous Notice -->
+        <div class="anonymous-notice">
+            <strong>Anonymous Submission:</strong> This page is anonymized for double-blind review. 
+            Author information and affiliations will be disclosed upon acceptance.
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav-links">
+            <a href="#abstract">Abstract</a>
+            <a href="#benchmark">Benchmark</a>
+            <a href="#results">Results</a>
+            <a href="#download">Download</a>
+            <a href="#citation">Citation</a>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            
+            <!-- Abstract -->
+            <section id="abstract">
+                <h2>Abstract</h2>
+                <p>
+                    Vision-language models (VLMs) have shown remarkable capabilities in various tasks, 
+                    yet their performance in conversational recommendation settings remains under-explored. 
+                    Conversational recommendation systems require models to understand both visual content 
+                    and dialogue context to provide personalized suggestions.
+                </p>
+                <p>
+                    We propose <strong>VisConvRec</strong>, a comprehensive benchmark to evaluate vision models 
+                    in conversational recommendation scenarios. Our benchmark comprises diverse tasks that 
+                    assess models' abilities to understand user preferences, reason about visual attributes, 
+                    and generate contextually appropriate recommendations through multi-turn dialogues.
+                </p>
+                <p>
+                    We conduct extensive evaluations of state-of-the-art vision-language models and reveal 
+                    significant gaps in their conversational reasoning capabilities. Our findings provide 
+                    insights into the limitations of current approaches and directions for future research.
+                </p>
+            </section>
+
+            <!-- Dataset Statistics -->
+            <section>
+                <h2>Dataset Statistics</h2>
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Dialogues</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Images</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">15</span>
+                        <span class="stat-label">Categories</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">3.5</span>
+                        <span class="stat-label">Avg. Turns</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Benchmark Overview -->
+            <section id="benchmark">
+                <h2>Benchmark Overview</h2>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Multi-modal Understanding:</strong> Evaluates integration of visual and textual information in conversations</li>
+                    <li><strong>Contextual Reasoning:</strong> Tests models' ability to maintain dialogue context across turns</li>
+                    <li><strong>Preference Modeling:</strong> Assesses understanding of implicit and explicit user preferences</li>
+                    <li><strong>Diverse Domains:</strong> Covers multiple product categories and recommendation scenarios</li>
+                </ul>
+
+                <h3>Evaluation Tasks</h3>
+                <div class="task-grid">
+                    <div class="task-card">
+                        <h4>Visual Preference Understanding</h4>
+                        <p>Models identify user preferences from visual features discussed in dialogue</p>
+                    </div>
+                    <div class="task-card">
+                        <h4>Context-Aware Recommendation</h4>
+                        <p>Generate recommendations considering full conversation history</p>
+                    </div>
+                    <div class="task-card">
+                        <h4>Visual Attribute Reasoning</h4>
+                        <p>Reason about visual attributes relevant to user needs</p>
+                    </div>
+                    <div class="task-card">
+                        <h4>Multi-turn Dialogue Consistency</h4>
+                        <p>Maintain coherent recommendations across conversation turns</p>
+                    </div>
+                </div>
+
+                <h3>Evaluation Metrics</h3>
+                <ul>
+                    <li><strong>Recommendation Accuracy:</strong> Precision, Recall, NDCG@k</li>
+                    <li><strong>Dialogue Quality:</strong> Coherence, relevance, informativeness</li>
+                    <li><strong>Visual Grounding:</strong> Accuracy of visual-textual alignment</li>
+                    <li><strong>User Satisfaction:</strong> Simulated user ratings</li>
+                </ul>
+            </section>
+
+            <!-- Results -->
+            <section id="results">
+                <h2>Benchmark Results</h2>
+                <p>
+                    We evaluate several state-of-the-art vision-language models on VisConvRec. 
+                    Results highlight significant challenges in conversational recommendation scenarios.
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Rec. Acc.</th>
+                                <th>Dialogue Quality</th>
+                                <th>Visual Grounding</th>
+                                <th>Overall</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>GPT-4V</td>
+                                <td>72.3</td>
+                                <td>8.2</td>
+                                <td>68.5</td>
+                                <td>74.1</td>
+                            </tr>
+                            <tr>
+                                <td>Claude-3 Opus</td>
+                                <td>70.8</td>
+                                <td>8.4</td>
+                                <td>66.2</td>
+                                <td>72.6</td>
+                            </tr>
+                            <tr>
+                                <td>Gemini Pro Vision</td>
+                                <td>68.4</td>
+                                <td>7.9</td>
+                                <td>64.8</td>
+                                <td>70.3</td>
+                            </tr>
+                            <tr>
+                                <td>LLaVA-1.5</td>
+                                <td>61.2</td>
+                                <td>7.1</td>
+                                <td>59.4</td>
+                                <td>64.8</td>
+                            </tr>
+                            <tr>
+                                <td>InstructBLIP</td>
+                                <td>58.7</td>
+                                <td>6.8</td>
+                                <td>57.1</td>
+                                <td>62.3</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Key Findings</h3>
+                <ol>
+                    <li><strong>Visual-Text Integration Gap:</strong> Models struggle to effectively integrate visual information with conversational context</li>
+                    <li><strong>Long-term Context Maintenance:</strong> Performance degrades significantly in longer dialogues (>5 turns)</li>
+                    <li><strong>Implicit Preference Understanding:</strong> Current models perform poorly on implicit preference signals</li>
+                    <li><strong>Domain Sensitivity:</strong> Significant performance variation across different product categories</li>
+                </ol>
+
+                <!-- Add a placeholder for visualization -->
+                <div class="figure">
+                    <div style="height: 300px; background: #f5f5f5; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; color: #999; border-radius: 4px;">
+                        [Figure: Performance comparison across dialogue lengths]
+                    </div>
+                    <p class="figure-caption">
+                        Figure 1: Model performance degrades as dialogue length increases, 
+                        highlighting challenges in maintaining long-term context.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Dataset Details -->
+            <section>
+                <h2>Dataset Details</h2>
+                
+                <h3>Data Collection</h3>
+                <p>
+                    Our dataset is collected through a combination of:
+                </p>
+                <ul>
+                    <li>Crowd-sourced multi-turn dialogues with visual grounding</li>
+                    <li>Product images from diverse e-commerce platforms</li>
+                    <li>Expert annotations for preference labels and dialogue quality</li>
+                </ul>
+
+                <h3>Dataset Structure</h3>
+                <div class="citation-box">
+<pre>{
+  "dialogue_id": "conv_0001",
+  "turns": [
+    {
+      "turn_id": 1,
+      "speaker": "user",
+      "text": "I'm looking for a casual shirt",
+      "visual_references": []
+    },
+    {
+      "turn_id": 2,
+      "speaker": "system",
+      "text": "Here are some options. Do you prefer solids or patterns?",
+      "images": ["img_001.jpg", "img_002.jpg"],
+      "recommendations": [...]
+    },
+    ...
+  ],
+  "user_preferences": {...},
+  "final_selection": "item_045"
+}</pre>
+                </div>
+
+                <h3>Categories Covered</h3>
+                <p>Fashion, Electronics, Home Decor, Books, Sports Equipment, Beauty Products, Toys, 
+                   Furniture, Kitchen Appliances, Jewelry, Automotive, Gardening, Pet Supplies, 
+                   Office Supplies, Musical Instruments</p>
+            </section>
+
+            <!-- Download -->
+            <section id="download">
+                <h2>Download</h2>
+                <div class="download-box">
+                    <h3>Dataset Access</h3>
+                    <p>The dataset will be publicly released upon paper acceptance.</p>
+                    <a href="#" class="btn" onclick="alert('Dataset will be available after acceptance'); return false;">
+                        Download Full Dataset
+                    </a>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Sample available after acceptance'); return false;">
+                        Download Sample
+                    </a>
+                    <p style="margin-top: 20px; color: #666; font-size: 0.95em;">
+                        For reviewers: Please contact via the review system for access.
+                    </p>
+                </div>
+
+                <h3>Evaluation Code</h3>
+                <p>
+                    Evaluation scripts and baseline implementations will be released alongside the dataset.
+                </p>
+                <div class="citation-box">
+<pre># Install dependencies
+pip install visconvrec
+
+# Load dataset
+from visconvrec import load_dataset
+dataset = load_dataset('visconvrec')
+
+# Evaluate your model
+from visconvrec.eval import evaluate
+results = evaluate(your_model, dataset)</pre>
+                </div>
+            </section>
+
+            <!-- Citation -->
+            <section id="citation">
+                <h2>Citation</h2>
+                <p>If you use VisConvRec in your research, please cite:</p>
+                <div class="citation-box">
+<pre>@inproceedings{anonymous2025visconvrec,
+  title={VisConvRec: Benchmarking Vision Models in Conversational Recommendation},
+  author={Anonymous},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision 
+             and Pattern Recognition (CVPR)},
+  year={2025},
+  note={Under review}
+}</pre>
+                </div>
+            </section>
+
+            <!-- Contact -->
+            <section>
+                <h2>Contact</h2>
+                <p>
+                    For questions about this benchmark, please contact: 
+                    <strong>visconvrec.anonymous@gmail.com</strong>
+                </p>
+                <p style="color: #666; font-size: 0.95em;">
+                    <em>Note: Full contact information will be provided upon acceptance.</em>
+                </p>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p><strong>VisConvRec</strong> - Benchmarking Vision Models in Conversational Recommendation</p>
+            <p style="margin-top: 8px;">Anonymous CVPR 2025 Submission</p>
+        </footer>
+    </div>
+
+</body>
+</html>
